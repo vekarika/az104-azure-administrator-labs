@@ -40,7 +40,7 @@ function Add-PreflightResult {
 }
 
 Add-PreflightResult -Id 'context' -Required $true -Passed $true -Actual "cloud=$($account.environmentName); tenant=<redacted>; subscription=<redacted>"
-$azVersion = (az version --query '"azure-cli"' --output tsv)
+$azVersion = (az version --output json | ConvertFrom-Json)."azure-cli"
 $bicepVersion = (az bicep version 2>&1 | Out-String).Trim()
 Add-PreflightResult -Id 'azure-cli' -Required $true -Passed ([bool]$azVersion) -Actual $azVersion
 Add-PreflightResult -Id 'powershell' -Required $true -Passed ($PSVersionTable.PSVersion -ge [version]'7.4') -Actual $PSVersionTable.PSVersion.ToString()

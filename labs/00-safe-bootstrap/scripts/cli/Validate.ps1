@@ -19,7 +19,7 @@ if (-not (Get-Command az -ErrorAction SilentlyContinue)) {
     throw 'Azure CLI is required. Run the repository readiness initializer, then retry.'
 }
 
-$LabRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
+$LabRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../../..')).Path
 $StateDir = Join-Path $LabRoot ".state/$RunId"
 $Manifest = Join-Path $StateDir 'run.json'
 $ValidationPath = Join-Path $StateDir 'validation.json'
@@ -93,7 +93,7 @@ if ($Mode -eq 'Deployment') {
     try {
         $LASTEXITCODE = 0
         & {
-$azureCliVersion = az version --query '"azure-cli"' --output tsv
+$azureCliVersion = (az version --output json | ConvertFrom-Json)."azure-cli"
 $bicepVersion = (az bicep version) -join ''
 if (-not $azureCliVersion -or -not $bicepVersion) {
   throw 'Azure CLI or the Bicep subcommand did not return a version.'
@@ -461,7 +461,7 @@ if ($Mode -eq 'Deployment') {
     try {
         $LASTEXITCODE = 0
         & {
-$readinessPath = Join-Path $LabRoot '../../.state/readiness.json'
+$readinessPath = Join-Path $LabRoot '.state/readiness.json'
 if (-not (Test-Path -LiteralPath $readinessPath)) {
   throw 'The readiness report is missing.'
 }
@@ -491,7 +491,7 @@ $readiness | Select-Object result, generatedAt
     try {
         $LASTEXITCODE = 0
         & {
-$readinessPath = Join-Path $LabRoot '../../.state/readiness.json'
+$readinessPath = Join-Path $LabRoot '.state/readiness.json'
 if (-not (Test-Path -LiteralPath $readinessPath)) {
   throw 'The readiness report is missing.'
 }

@@ -23,7 +23,7 @@ if (-not (Get-Command az -ErrorAction SilentlyContinue)) {
     throw 'Azure CLI is required. Run the repository readiness initializer, then retry.'
 }
 
-$LabRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
+$LabRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../../..')).Path
 $StateDir = Join-Path $LabRoot ".state/$RunId"
 $Manifest = Join-Path $StateDir 'run.json'
 $ResourceGroupName = $(if ('00' -in @('00', '01', '02')) { $null } else { "rg-az104-l00-$RunId" })
@@ -174,7 +174,7 @@ try {
 
     $versions = [ordered]@{
         PowerShell = $PSVersionTable.PSVersion.ToString()
-        AzureCLI  = (az version --query '"azure-cli"' --output tsv)
+        AzureCLI  = (az version --output json | ConvertFrom-Json)."azure-cli"
         Bicep     = ((az bicep version) -join '')
         AzCopy    = ((azcopy --version) -join '')
         Python    = ((python --version) -join '')
@@ -277,7 +277,7 @@ try {
     $activeCheckpointId = 'LAB00-CP05'
     Save-RunState
 
-    $readinessScript = (Resolve-Path (Join-Path $LabRoot '../../tools/Test-LabEnvironment.ps1')).Path
+    $readinessScript = (Resolve-Path (Join-Path $LabRoot 'tools/Test-LabEnvironment.ps1')).Path
     az account show --query environmentName --output tsv
     & pwsh -NoLogo -NoProfile -File $readinessScript -LabId 'LAB-00'
     if ($LASTEXITCODE -ne 0) { throw 'Readiness reported a required failure.' }
